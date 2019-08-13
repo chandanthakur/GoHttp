@@ -55,21 +55,21 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 	// Unmarshal
 	var msg StockBatch
 	err = json.Unmarshal(b, &msg)
-
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
 
-	output, err := json.Marshal(msg)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-
+	/*
+		output, err := json.Marshal(msg)
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		} */
 	//log.Println(string(output))
 	w.Header().Set("content-type", "application/json")
-	w.Write(output)
+	//w.Write(byte(`true`)
+	fmt.Fprintf(w, "true")
 	totalRequestProcessed++
 	if totalRequestProcessed%4000 == 0 {
 		log.Printf("Request Processed: %d\n", totalRequestProcessed)

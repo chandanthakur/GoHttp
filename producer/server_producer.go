@@ -47,15 +47,16 @@ func sendPostRequest(data []byte) {
 }
 
 func decodeResponse(resp *http.Response) {
-	b, err := ioutil.ReadAll(resp.Body)
+	//b, err := ioutil.ReadAll(resp.Body)
+	ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
-	if err != nil {
-		return
-	}
+	//if err != nil {
+	//	return
+	//}
 
 	//log.Println(string(b))
-	var msg StockBatch
-	err = json.Unmarshal(b, &msg)
+	//var msg StockBatch
+	//err = json.Unmarshal(b, &msg)
 }
 
 func sendPostRequestRespOnChannel(data []byte, results chan<- []byte) {
