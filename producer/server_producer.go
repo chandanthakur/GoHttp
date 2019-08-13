@@ -75,7 +75,7 @@ func testSimple(totalReq int) {
 }
 
 func testWithWorker(totalReq int) {
-	var nWorkers = 20
+	var nWorkers = 50
 	// In order to use our pool of workers we need to send
 	// them work and collect their results. We make 2
 	// channels for this.
