@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html"
 	"io/ioutil"
+	"log"
 	"net/http"
 )
 
@@ -13,6 +14,13 @@ type StockSchema struct {
 	Symbol string
 	Price  float64
 }
+
+//StockBatch Used for stock schema
+type StockBatch struct {
+	Items []StockSchema
+}
+
+var totalRequestProcessed = 0
 
 func main() {
 	var port = ":3001"
@@ -45,8 +53,9 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Unmarshal
-	var msg StockSchema
+	var msg StockBatch
 	err = json.Unmarshal(b, &msg)
+
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -58,7 +67,11 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//log.Println(string(output))
 	w.Header().Set("content-type", "application/json")
 	w.Write(output)
-	//fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path)+t.Price)
+	totalRequestProcessed++
+	if totalRequestProcessed%4000 == 0 {
+		log.Printf("Request Processed: %d\n", totalRequestProcessed)
+	}
 }
