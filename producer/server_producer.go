@@ -11,21 +11,18 @@ import (
 
 var stockList = []string{"msft", "goog", "amzn", "ntnx", "netflix", "fb", "uber", "apl"}
 var priceList = []float64{140.0, 1200, 1950, 20, 340, 190, 40, 200}
+var url = "http://139.59.88.85:3001/stock/"
 
 func main() {
 	start := time.Now()
-	var totalReq = 10000
-	for w := 1; w <= totalReq; w++ {
-		sendPostRequest(getNextStockUpdate())
-	}
-
+	var totalRequest = 10000
+	testWithWorker(totalRequest)
+	//testSimple(totalRequest)
 	elapsed := time.Since(start)
-	log.Printf("Time taken %s for %d requests", elapsed, totalReq)
-	//test()
+	log.Printf("Time taken %s for %d requests", elapsed, totalRequest)
 }
 
 func sendStocksPostRequest(stock string, price float64) {
-	url := "http://localhost:3001/stock/"
 	message := map[string]interface{}{
 		"Symbol": stock,
 		"Price":  price,
@@ -47,7 +44,6 @@ func sendStocksPostRequest(stock string, price float64) {
 }
 
 func sendPostRequest(data []byte) {
-	url := "http://localhost:3001/stock/"
 	resp, err := http.Post(url, "application/json", bytes.NewBuffer(data))
 	if err != nil {
 		log.Fatalln(err)
@@ -68,10 +64,14 @@ func worker(id int, jobs <-chan []byte, results chan<- []byte) {
 		go sendPostRequestRespOnChannel(j, results)
 	}
 }
+func testSimple(totalReq int) {
+	for w := 1; w <= totalReq; w++ {
+		sendPostRequest(getNextStockUpdate())
+	}
+}
 
-func test() {
-	start := time.Now()
-	var nWorkers = 10
+func testWithWorker(totalReq int) {
+	var nWorkers = 20
 	// In order to use our pool of workers we need to send
 	// them work and collect their results. We make 2
 	// channels for this.
@@ -85,7 +85,6 @@ func test() {
 		go worker(w, jobs, results)
 	}
 
-	var totalReq = 10000
 	var interations = totalReq / nWorkers
 	for j := 1; j <= interations; j++ {
 		for a := 1; a <= nWorkers; a++ {
@@ -98,8 +97,6 @@ func test() {
 	}
 
 	close(jobs)
-	elapsed := time.Since(start)
-	log.Printf("Time taken %s for %d requests", elapsed, totalReq)
 }
 
 func getNextStockUpdate() []byte {
